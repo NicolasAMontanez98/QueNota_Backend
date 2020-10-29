@@ -1,8 +1,78 @@
 const studentCtrl = {};
 
 const Student = require("../models/student.model");
-const { getToken, isAuth } = require("../util/middlewares");
+const { getToken } = require("../util/middlewares");
 const bcrypt = require("bcrypt");
+
+studentCtrl.getAllStudents = async (req, res) => {
+  try {
+    const students = await Student.find({}, "_id names lastNames");
+    if (students) {
+      res.status(200).send(students);
+    }
+  } catch (error) {
+    res.status(400).send({ message: "Something went wrong", data: error });
+  }
+}; 
+
+studentCtrl.getInfo = async (req, res) => {
+  try {
+    const student = await Student.findById(
+      req.params.id,
+      "idNumberStudent birthDateStudent namesTutor lastNamesTutor idTypeTutor idNumberTutor birthDateTutor emailTutor school pictureProfile homeworks"
+    ).populate('homeworks');
+    if (student) {
+      res.status(200).send(student); 
+    }
+  } catch (error) {
+    res.status(400).send({ message: "Something went wrong", data: error });
+  }
+};
+
+studentCtrl.getInfoStudent = async (req, res) => {
+  try {
+    const student = await Student.findById(
+      req.params.id,
+      "names lastNames pictureProfile"
+    );
+    if (student) {
+      res.status(200).send(student);
+    }
+  } catch (error) {
+    res.status(400).send({ message: "Something went wrong", data: error });
+  }
+};
+
+studentCtrl.getHomeworksByStudent = async (req, res) => {
+  try {
+    const homeworks = await Student.findById(
+      req.params.id,
+      "homeworks"
+    ).populate({
+      path: "homeworks",
+      select:
+        "_id course deliveryDate description subject supportMaterial teacher title",
+      model: "Homework",
+      populate: [
+        {
+          path: "teacher",
+          select: "_id names lastNames phone email",
+        },
+        {
+          path: "course",
+          select: "_id title students subject",
+        },
+      ],
+    });
+    if (homeworks) {
+      res.status(200).send(homeworks);
+    } else {
+      throw new Error("El estudiante no tiene tareas.");
+    }
+  } catch (error) {
+    res.status(400).send({ message: error });
+  }
+};
 
 studentCtrl.register = async (req, res) => {
   try {
@@ -13,7 +83,7 @@ studentCtrl.register = async (req, res) => {
       idNumberStudent: req.body.idNumberStudent,
       birthDateStudent: req.body.birthDateStudent,
       namesTutor: req.body.namesTutor,
-      lastNames: req.body.lastNames,
+      lastNamesTutor: req.body.lastNamesTutor,
       idTypeTutor: req.body.idTypeTutor,
       idNumberTutor: req.body.idNumberTutor,
       birthDateTutor: req.body.birthDateTutor,
@@ -29,7 +99,7 @@ studentCtrl.register = async (req, res) => {
         _id: newStudent._id,
         names: newStudent.names,
         lastNames: newStudent.lastNames,
-        email: newStudent.email,
+        email: newStudent.emailStudent,
         token: getToken(newStudent),
       });
     }
@@ -42,7 +112,7 @@ studentCtrl.register = async (req, res) => {
 studentCtrl.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const student = await Student.findOne({ email });
+    const student = await Student.findOne({ emailStudent: email });
     if (!student) {
       throw new Error("El alumno no existe");
     }
@@ -54,11 +124,12 @@ studentCtrl.login = async (req, res) => {
       _id: student._id,
       names: student.names,
       lastNames: student.lastNames,
-      email: student.email,
+      email: student.emailStudent,
       token: getToken(student),
     });
   } catch (error) {
-    res.status(400).send({ message: "Something went wrong", data: error });
+    console.log(error);
+    res.status(400).send({ message: error });
   }
 };
 
@@ -76,13 +147,13 @@ studentCtrl.update = async (req, res) => {
         req.body.pictureProfile || student.pictureProfile;
       student.email = req.body.email || student.email;
       const updatedStudent = await student.save(student);
-      if (updatedTeacher) {
+      if (updatedStudent) {
         res.status(200).send({
-          _id: updatedTeacher._id,
-          names: updatedTeacher.names,
-          lastNames: updatedTeacher.lastNames,
-          email: updatedTeacher.email,
-          token: getToken(updatedTeacher),
+          _id: updatedStudent._id,
+          names: updatedStudent.names,
+          lastNames: updatedStudent.lastNames,
+          email: updatedStudent.emailStudent,
+          token: getToken(updatedStudent),
         });
       }
     }

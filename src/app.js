@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
+const { formData } = require("./util/middlewares");
 
 const app = express();
 
@@ -17,5 +18,11 @@ app.use("/api/student", require("./routes/student"));
 app.use("/api/course", require("./routes/course"));
 app.use("/api/homework", require("./routes/homework"));
 app.use("/api/note", require("./routes/note"));
+
+//cloudinary
+app.post("/api/image", formData, (req, res) => {
+  const url = req.body.file.secure_url;
+  res.status(200).json(url);
+});
 
 module.exports = app;

@@ -1,13 +1,20 @@
 const router = require("express").Router();
 const {
   addHomework,
+  addSupportMaterial,
+  getHomeworksByTeacher,
+  getHomeworksByStudent,
   deleteHomework,
   updateHomework,
+  getHomeworksByCourse,
 } = require("../controllers/homework.controller");
-const { isAuth } = require("../util/middlewares");
 
-router.route("/add", isAuth).post(addHomework);
-router.route("/delete/:id", isAuth).delete(deleteHomework);
-router.route("/update/:id", isAuth).patch(updateHomework);
+router.route("/teacher/:id").get(getHomeworksByTeacher);
+router.route("/student/:id").get(getHomeworksByStudent);
+router.route("/by-course/:id").get(getHomeworksByCourse);
+router.route("/add").post(addHomework);
+router.route("/delete/:id").delete(deleteHomework);
+router.route("/update/:id").put(updateHomework);
+router.route("/add-material/:id").put(addSupportMaterial);
 
 module.exports = router;

@@ -23,7 +23,7 @@ const studentSchema = new Schema(
       type: String,
       required: true,
     },
-    lastNames: {
+    lastNamesTutor: {
       type: String,
       required: true,
     },
@@ -69,6 +69,12 @@ const studentSchema = new Schema(
       {
         type: Schema.Types.ObjectId,
         ref: "Course",
+      },
+    ],
+    homeworks: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Homework",
       },
     ],
   },

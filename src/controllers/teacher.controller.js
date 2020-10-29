@@ -4,9 +4,24 @@ const Teacher = require("../models/teacher.model");
 const { getToken, isAuth } = require("../util/middlewares");
 const bcrypt = require("bcrypt");
 
+teacherCtrl.getInfo = async (req, res) => {
+  try {
+    const teacher = await Teacher.findById(
+      req.params.id,
+      "idType idNumber birthDate phone pictureProfile isVerified"
+    );
+    if (teacher) {
+      res.status(200).send(teacher);
+    }
+  } catch (error) {
+    res.status(400).send({ message: "Something went wrong", data: error });
+  }
+};
+
 teacherCtrl.register = async (req, res) => {
   try {
-    const encryptedPassword = await bcrypt.hash(req.body.password, 7);
+    const { password } = req.body;
+    const encryptedPassword = await bcrypt.hash(password, 7);
     const teacher = new Teacher({
       names: req.body.names,
       lastNames: req.body.lastNames,

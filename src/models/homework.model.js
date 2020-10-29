@@ -21,7 +21,6 @@ const homeworkSchema = new Schema(
     },
     deliveryDate: {
       type: String,
-      required: true,
     },
     description: {
       type: String,
@@ -29,8 +28,14 @@ const homeworkSchema = new Schema(
     },
     supportMaterial: [
       {
+        title: { type: String },
+        file: { type: String },
+      },
+    ],
+    notes: [
+      {
         type: Schema.Types.ObjectId,
-        ref: "SupportMaterial",
+        ref: "Note",
       },
     ],
   },

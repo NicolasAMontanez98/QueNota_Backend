@@ -45,10 +45,6 @@ const teacherSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    photo: {
-      type: String,
-      required: true,
-    },
     courses: [
       {
         type: Schema.Types.ObjectId,

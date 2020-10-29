@@ -16,10 +16,23 @@ const noteSchema = new Schema(
       type: Schema.Types.ObjectId,
       required: true,
     },
-    mark: {
+    qualification: {
       type: Number,
       required: true,
     },
+    observations: {
+      type: String,
+    },
+    isQualified: {
+      type: Boolean,
+      default: false,
+    },
+    files: [
+      {
+        title: { type: String },
+        file: { type: String },
+      },
+    ],
   },
   {
     timestamps: true,
